@@ -1,7 +1,8 @@
-// Cloudflare Worker entry: /api/* runs the shared API, everything else is served from ./public
+// Cloudflare Worker entry: every request passes the password gate (worker/auth.js); then /api/* runs the shared API, everything else is served from ./public
 // by Workers Static Assets (configured in wrangler.jsonc, with single-page-app fallback).
 import { handleApi } from '../server/api.js';
 import { setFeedStore } from '../server/feeds.js';
+import { gate } from './auth.js';
 
 // Feed results are kept in Cloudflare's edge cache so every isolate in a data centre shares them,
 // instead of each one refetching every publisher.
@@ -21,6 +22,9 @@ setFeedStore({
 
 export default {
   async fetch(request, env, ctx) {
+    const blocked = await gate(request, env);
+    if (blocked) return blocked;
+
     const url = new URL(request.url);
     if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
 

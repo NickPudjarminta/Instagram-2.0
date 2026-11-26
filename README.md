@@ -81,4 +81,14 @@ npm run deploy     # publish to https://pulse-news.<your-subdomain>.workers.dev
 npm run cf:tail    # stream live logs
 ```
 
+### Password
+
+The Workers site is private: every page and API call goes through a sign-in page (`worker/auth.js`). The password is the `SITE_PASSWORD` Worker secret, which is never stored in the repo:
+
+```bash
+npx wrangler secret put SITE_PASSWORD   # set or change it; changing it signs everyone out
+```
+
+Signing in keeps you signed in on that device for a year. Visit `/__logout` to sign out. Without the secret the site stays locked. For `npm run cf:dev`, put `SITE_PASSWORD=...` in `.dev.vars` (git-ignored). The local Node server (`npm start`) has no password.
+
 On Workers the private-network check only blocks IP literals, because Workers can't reach private networks anyway. Node also checks DNS answers.
