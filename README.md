@@ -1,6 +1,6 @@
-# Pulse: an Instagram-style news feed
+# Instagram 2.0: an Instagram-style news feed
 
-Pulse turns RSS/Atom news feeds into a photo feed like Instagram's: big images, short captions, stories and an explore grid. It's for following **news** on tech, AI, gaming, science, space, security and dev. It has no video channels and no friends-and-family posts.
+Instagram 2.0 turns RSS/Atom news feeds into a photo feed like Instagram's: big images, short captions, stories and an explore grid. It's for following **news** on tech, AI, gaming, science, space, security and dev. It has no video channels and no friends-and-family posts.
 
 ```bash
 npm install
@@ -13,7 +13,7 @@ Requires Node 18.17+. The only dependency is `fast-xml-parser`.
 
 ## What it looks like
 
-| Instagram | Pulse |
+| Instagram | Instagram 2.0 |
 |---|---|
 | Home feed | Posts from the sources you follow, newest first, with an image (or a styled title card), a bold headline and a two-line caption with **more** |
 | Stories | One circle per topic or hashtag you follow. Tap to flip through the top headlines full-screen. The rings go grey once you've seen them |
@@ -27,7 +27,7 @@ Requires Node 18.17+. The only dependency is `fast-xml-parser`.
 
 Open **Follow feeds** (the ⊕ tab) and type any of these:
 
-- **A website** (`theverge.com`): Pulse finds its RSS/Atom feed from the page, or by trying common paths like `/feed`.
+- **A website** (`theverge.com`): Instagram 2.0 finds its RSS/Atom feed from the page, or by trying common paths like `/feed`.
 - **A feed URL** (`https://hnrss.org/newest?q=LLM`): any RSS, Atom or RDF feed.
 - **A #hashtag** (`#Steam Deck`): a live news search through Bing News RSS, which comes with thumbnails.
 - **A subreddit** (`r/MachineLearning`): the subreddit's top posts of the day.

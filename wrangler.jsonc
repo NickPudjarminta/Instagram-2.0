@@ -1,4 +1,4 @@
-// Cloudflare Workers deployment for Pulse. Deploy with `npm run deploy`
+// Cloudflare Workers deployment for Instagram 2.0. Deploy with `npm run deploy`
 // (needs CLOUDFLARE_API_TOKEN, and CLOUDFLARE_ACCOUNT_ID if the token can see several accounts).
 {
   "$schema": "node_modules/wrangler/config-schema.json",

@@ -32,7 +32,7 @@ const post = (path, body) => realFetch(base + path, { method: 'POST', headers: {
 
 test('serves the app shell and catalog without video sources', async () => {
   const html = await (await realFetch(`${base}/`)).text();
-  assert.match(html, /<title>Pulse/);
+  assert.match(html, /<title>Instagram 2.0/);
   const cat = await (await realFetch(`${base}/api/catalog`)).json();
   assert.ok(cat.sources.length > 20);
   assert.ok(cat.sources.every((s) => !/youtube|twitch/.test(s.url)));

@@ -1,4 +1,4 @@
-// Pulse — Instagram-style news feed. Vanilla JS, no build step.
+// Instagram 2.0 — Instagram-style news feed. Vanilla JS, no build step.
 
 // ---------------------------------------------------------------------------
 // Utilities
@@ -497,7 +497,7 @@ function renderRail() {
       <div class="meta"><b>${esc(s.name)}</b><small>${esc(state.catalog.topics.find((t) => t.id === s.topic)?.name || '')}</small></div>
       <button class="btn link small" data-action="follow" data-source="${s.id}">Follow</button></div>`).join('')}` : ''}
     ${tags.length ? `<h3 style="margin-top:22px">Trending hashtags</h3><div class="tag-cloud">${tags.map((t) => `<button class="chip" data-action="follow-tag" data-tag="${esc(t)}">#${esc(t.replace(/\s+/g, ''))}</button>`).join('')}</div>` : ''}
-    <footer>Pulse · News from the sources you follow, as a photo feed.<br>Posts link to the original publisher.</footer>`;
+    <footer>Instagram 2.0 · News from the sources you follow, as a photo feed.<br>Posts link to the original publisher.</footer>`;
 }
 
 let exploreQuery = '';
@@ -703,7 +703,7 @@ function exportOpml() {
   const feeds = [...followedFeeds()].map((f) => ({ ...f, meta: sourceMeta(f.id) }));
   const x = (s) => esc(s);
   const body = feeds.map((f) => `    <outline type="rss" text="${x(f.meta.name)}" title="${x(f.meta.name)}" xmlUrl="${x(f.url)}" htmlUrl="${x(f.meta.site || '')}"/>`).join('\n');
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<opml version="2.0">\n  <head><title>Pulse subscriptions</title></head>\n  <body>\n${body}\n  </body>\n</opml>\n`;
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<opml version="2.0">\n  <head><title>Instagram 2.0 subscriptions</title></head>\n  <body>\n${body}\n  </body>\n</opml>\n`;
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([xml], { type: 'text/x-opml' }));
   a.download = 'pulse-subscriptions.opml';
@@ -767,7 +767,7 @@ function openMenu(item) {
 function onboarding() {
   const picked = new Set(['tech', 'ai', 'gaming']);
   const m = openModal(`<div class="sheet">
-    <h2>Welcome to Pulse 👋</h2>
+    <h2>Welcome to Instagram 2.0 👋</h2>
     <p class="muted">Pick what you're into. We'll follow the best sources for each — you can fine-tune later.</p>
     <div class="topic-pick">${state.catalog.topics.map((t) => `<button data-topic="${t.id}" class="${picked.has(t.id) ? 'on' : ''}"><span class="e">${t.emoji}</span>${esc(t.name)}</button>`).join('')}</div>
     <button class="btn" style="width:100%;height:44px" data-go>Start reading</button>
@@ -1151,7 +1151,7 @@ async function boot() {
   try {
     state.catalog = await api('/api/catalog');
   } catch (err) {
-    view.innerHTML = emptyState('refresh', 'Pulse is offline', esc(err.message));
+    view.innerHTML = emptyState('refresh', 'Instagram 2.0 is offline', esc(err.message));
     return;
   }
   for (const s of state.catalog.sources) sourceById.set(s.id, s);

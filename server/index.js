@@ -1,4 +1,4 @@
-// Pulse — Node server: static app + JSON API (the same API runs on Cloudflare Workers, see worker/index.js).
+// Instagram 2.0 — Node server: static app + JSON API (the same API runs on Cloudflare Workers, see worker/index.js).
 import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -101,5 +101,5 @@ export function createServer() {
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
-  createServer().listen(PORT, HOST, () => console.log(`Pulse running at http://localhost:${PORT}`));
+  createServer().listen(PORT, HOST, () => console.log(`Instagram 2.0 running at http://localhost:${PORT}`));
 }
