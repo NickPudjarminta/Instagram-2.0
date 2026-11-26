@@ -74,7 +74,6 @@ const ICONS = {
   search: '<circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4.5 4.5"/>',
   plus: '<rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/>',
   bookmark: '<path d="M6 3h12v18l-6-4.6L6 21z"/>',
-  heart: '<path d="M12 20.5s-7.6-4.6-9.3-9.5C1.5 7.5 3.7 4 7.3 4c2 0 3.6 1.1 4.7 2.8C13.1 5.1 14.7 4 16.7 4c3.6 0 5.8 3.5 4.6 7-1.7 4.9-9.3 9.5-9.3 9.5z"/>',
   send: '<path d="M22 3 10 14M22 3l-7 18-3.4-7.6L3 10z"/>',
   external: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
   more: '<path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3.2"/>',
@@ -100,7 +99,6 @@ function hydrateIcons(root = document) {
 const state = {
   catalog: { topics: [], sources: [], suggestedTags: [] },
   follows: store.get('follows', null), // { sources: [catalogId], custom: [{ id, name, url, kind, site, topic, tag }] }
-  liked: new Map(store.get('liked', []).map((it) => [it.id, it])),
   saved: new Map(store.get('saved', []).map((it) => [it.id, it])),
   hidden: new Set(store.get('hidden', [])),
   seen: new Set(store.get('seen', [])),
@@ -326,7 +324,6 @@ function postHtml(item) {
   const meta = sourceMeta(item.sourceId, item);
   const topic = state.catalog.topics.find((t) => t.id === meta.topic);
   const link = safeUrl(item.link);
-  const liked = state.liked.has(item.id);
   const saved = state.saved.has(item.id);
   const sub = [meta.kind === 'tag' && item.via ? `via ${item.via}` : topic?.name, item.author && item.author !== meta.name ? item.author : '']
     .filter(Boolean).map(esc).join('<span class="dot"></span>');
@@ -340,24 +337,20 @@ function postHtml(item) {
       </div>
       <button class="icon-btn" data-action="menu" aria-label="More options">${icon('more')}</button>
     </header>
-    <div class="post-media" data-media data-link="${esc(link)}" data-img="${esc(safeUrl(item.image))}" data-action="media">
+    <div class="post-media" data-media data-link="${esc(link)}" data-img="${esc(safeUrl(item.image))}">
       ${textCard(item, meta)}
-      ${icon('heart', 'big-heart')}
     </div>
     <div class="post-actions">
-      <button data-action="like" class="${liked ? 'liked' : ''}" aria-pressed="${liked}" aria-label="Like">${icon('heart')}</button>
       <button data-action="share" aria-label="Share">${icon('send')}</button>
       <a href="${esc(link)}" target="_blank" rel="noopener noreferrer" aria-label="Open article">${icon('external')}</a>
       <span class="spacer"></span>
       <button data-action="save" class="${saved ? 'saved' : ''}" aria-pressed="${saved}" aria-label="Save">${icon('bookmark')}</button>
     </div>
     <div class="post-body">
-      ${liked ? '<div class="post-likes">Liked by you</div>' : ''}
       <h3 class="post-title"><a href="${esc(link)}" target="_blank" rel="noopener noreferrer">${esc(item.title)}</a></h3>
       ${item.excerpt ? `<div class="post-caption clamp"><a class="post-src" href="${profileHref(meta)}">${esc(meta.name)}</a> ${esc(item.excerpt)}</div>
       <button class="more-btn" data-action="expand">more</button>` : ''}
       ${tags.length ? `<div class="post-tags">${tags.map((t) => `<a href="#/tag/${encodeURIComponent(t)}">#${esc(t.replace(/\s+/g, ''))}</a>`).join('')}</div>` : ''}
-      <a class="read-link" href="${esc(link)}" target="_blank" rel="noopener noreferrer">Read on ${esc(item.via || hostOf(link))} ${icon('external')}</a>
       <div class="post-time">${timeAgo(item.published, true)}</div>
     </div>
   </article>`;
@@ -586,17 +579,15 @@ async function renderProfile({ meta, feed, isTag }) {
   view._profileItems = items;
 }
 
-function renderSaved(tab = 'saved') {
+function renderSaved() {
   setNav('saved');
   view.className = 'view wide';
   rail.classList.add('hidden');
-  const map = tab === 'liked' ? state.liked : state.saved;
-  const items = [...map.values()].reverse();
-  view.innerHTML = `<h1 class="page-title">${tab === 'liked' ? 'Liked posts' : 'Saved'}</h1>
-    <div class="tabs"><a href="#/saved" class="${tab === 'saved' ? 'active' : ''}">${icon('bookmark')} Saved</a><a href="#/saved/liked" class="${tab === 'liked' ? 'active' : ''}">${icon('heart')} Liked</a></div>
+  const items = [...state.saved.values()].reverse();
+  view.innerHTML = `<h1 class="page-title">Saved</h1>
     <div class="grid" id="savedGrid"></div>`;
   if (!items.length) {
-    $('#savedGrid').outerHTML = emptyState(tab === 'liked' ? 'heart' : 'bookmark', tab === 'liked' ? 'No likes yet' : 'Save posts for later', tab === 'liked' ? 'Double-tap a post image to like it.' : 'Tap the bookmark on any post to keep it here.');
+    $('#savedGrid').outerHTML = emptyState('bookmark', 'Save posts for later', 'Tap the bookmark on any post to keep it here.');
     return;
   }
   renderPaged($('#savedGrid'), items, tileHtml, 30);
@@ -888,19 +879,6 @@ function openStories(groupIndex) {
 // ---------------------------------------------------------------------------
 // Actions
 
-function setLiked(item, on) {
-  if (on) state.liked.set(item.id, item); else state.liked.delete(item.id);
-  persistMapCapped('liked', state.liked);
-  for (const post of $$(`.post[data-id="${CSS.escape(item.id)}"]`)) {
-    const b = $('[data-action="like"]', post);
-    b.classList.toggle('liked', on);
-    b.setAttribute('aria-pressed', on);
-    const likes = $('.post-likes', post);
-    if (on && !likes) $('.post-body', post).insertAdjacentHTML('afterbegin', '<div class="post-likes">Liked by you</div>');
-    if (!on) likes?.remove();
-  }
-}
-
 function toggleSaved(item) {
   const on = !state.saved.has(item.id);
   if (on) state.saved.set(item.id, item); else state.saved.delete(item.id);
@@ -943,7 +921,6 @@ function itemFromEvent(target) {
   return id ? itemIndex.get(id) : null;
 }
 
-let lastTap = 0;
 document.addEventListener('click', async (e) => {
   const el = e.target.closest('[data-action]');
   if (!el) return;
@@ -951,26 +928,12 @@ document.addEventListener('click', async (e) => {
   const item = itemFromEvent(el);
 
   switch (action) {
-    case 'like': return item && setLiked(item, !state.liked.has(item.id));
     case 'save': return item && toggleSaved(item);
     case 'share': return item && share(item);
     case 'menu': return item && openMenu(item);
     case 'expand': {
       el.previousElementSibling?.classList.remove('clamp');
       return el.remove();
-    }
-    case 'media': {
-      // Double-tap / double-click to like, just like a photo feed.
-      const now = Date.now();
-      if (now - lastTap < 320 && item) {
-        setLiked(item, true);
-        const heart = $('.big-heart', el);
-        heart.classList.remove('pop');
-        void heart.getBoundingClientRect();
-        heart.classList.add('pop');
-        lastTap = 0;
-      } else lastTap = now;
-      return;
     }
     case 'open-post': return item && openPost(item);
     case 'story': return openStories(Number(el.dataset.index));
@@ -1106,7 +1069,7 @@ async function route() {
   }
   if (page === 'explore') return renderExplore(arg || 'all');
   if (page === 'following') return renderFollowing();
-  if (page === 'saved') return renderSaved(arg === 'liked' ? 'liked' : 'saved');
+  if (page === 'saved') return renderSaved();
   if (page === 'source') {
     const id = decodeURIComponent(arg);
     const meta = allSources().get(id);

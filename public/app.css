@@ -132,19 +132,13 @@ svg.i { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-widt
 .text-card .tc-title { font-size: clamp(19px, 5.4vw, 25px); font-weight: 800; line-height: 1.18; letter-spacing: -0.3px; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; text-wrap: balance; }
 .text-card .tc-mark { position: absolute; top: 18px; right: 20px; font-size: 32px; opacity: .9; }
 .post-media.has-img .text-card, .tile.has-img .text-card { display: none; }
-.big-heart { position: absolute; inset: 0; margin: auto; width: 96px; height: 96px; color: #fff; fill: #fff; stroke: none; filter: drop-shadow(0 4px 18px rgb(0 0 0 / .35)); opacity: 0; transform: scale(.3); pointer-events: none; }
-.big-heart.pop { animation: pop .9s ease forwards; }
-@keyframes pop { 15% { opacity: .95; transform: scale(1.15); } 30% { transform: scale(.95); } 45%, 80% { opacity: .95; transform: scale(1); } 100% { opacity: 0; transform: scale(.85) translateY(-14px); } }
 
 .post-actions { display: flex; align-items: center; gap: 4px; padding: 6px 6px 0; }
 .post-actions button, .post-actions a { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; }
 .post-actions button:hover, .post-actions a:hover { color: var(--fg-soft); }
 .post-actions .spacer { flex: 1; }
-.liked svg { fill: var(--like); stroke: var(--like); animation: beat .35s ease; }
 .saved svg { fill: currentColor; }
-@keyframes beat { 50% { transform: scale(1.25); } }
 .post-body { padding: 2px 12px 0; }
-.post-likes { font-weight: 650; margin-bottom: 4px; }
 .post-title { font-weight: 700; font-size: 15px; line-height: 1.35; margin: 0 0 4px; }
 .post-title a:hover { text-decoration: underline; }
 .post-caption { color: var(--fg); overflow-wrap: anywhere; }
@@ -152,8 +146,6 @@ svg.i { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-widt
 .more-btn { color: var(--fg-soft); }
 .post-tags { margin-top: 4px; color: var(--accent); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px; }
 .post-time { margin-top: 6px; color: var(--fg-soft); font-size: 11px; letter-spacing: .03em; text-transform: uppercase; }
-.read-link { display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; color: var(--accent); font-weight: 600; font-size: 13px; }
-.read-link svg { width: 16px; height: 16px; }
 
 /* ---------- Buttons, chips, inputs ---------- */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 34px; padding: 0 16px; border-radius: 9px; font-weight: 650; background: var(--accent); color: #fff; white-space: nowrap; }

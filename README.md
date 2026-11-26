@@ -17,7 +17,8 @@ Requires Node 18.17+. The only dependency is `fast-xml-parser`.
 |---|---|
 | Home feed | Posts from the sources you follow, newest first, with an image (or a styled title card), a bold headline and a two-line caption with **more** |
 | Stories | One circle per topic or hashtag you follow. Tap to flip through the top headlines full-screen. The rings go grey once you've seen them |
-| Double-tap to like | Same. Likes and saves are kept on your device |
+| Home feed ranking | Newest first, but mixed: each extra post from the same source counts as 90 minutes older, and a source can't show up again until 3 other posts have, so one busy feed can't take over |
+| Saved | Bookmark posts to read later. Saves are kept on your device |
 | Explore | A grid of posts from the whole catalog, filtered by topic, with search |
 | Profiles | Every source has a profile page with a post grid, its feed and a Follow button |
 | Hashtags | `#Nintendo`, `#OpenAI` and so on. Following one gives you a live news search for it |
@@ -35,6 +36,10 @@ Open **Follow feeds** (the ⊕ tab) and type any of these:
 - **The curated catalog**: about 35 hand-picked sources across 7 topics, with **Follow all** per topic. Edit `server/catalog.js` to change it.
 
 YouTube, youtu.be and Twitch URLs are refused everywhere (catalog, discovery and individual feed items).
+
+## Spam filter
+
+Ads and promotions are dropped before they reach the feed (`server/rank.js`): promo and coupon codes, sponsored or partner content, "% off" / "save $X" / "best deals" / "lowest price" headlines, giveaways, posts tagged Deals or Sponsored, and links under paths like `/deals/`. Excerpts are only checked for unambiguous markers (promo codes, "sponsored"), so real news that mentions a sale is kept. Add patterns there to tighten it.
 
 ## Performance
 

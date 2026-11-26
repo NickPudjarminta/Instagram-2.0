@@ -1,6 +1,7 @@
 // RSS / Atom / RDF parsing and normalisation into "posts" with images and short captions.
 import { XMLParser } from 'fast-xml-parser';
 import { fetchText, isVideoUrl, Lru, mapLimit } from './net.js';
+import { diversify, isSpam } from './rank.js';
 
 const ARRAY_TAGS = new Set(['item', 'entry', 'link', 'enclosure', 'category', 'media:content', 'media:thumbnail', 'media:group']);
 
@@ -268,7 +269,8 @@ export async function getFeed(url) {
 }
 
 /**
- * Fetch many feeds and merge them into one newest-first timeline.
+ * Fetch many feeds and merge them into one timeline: ads/promos dropped, duplicates removed,
+ * newest first but mixed so no single source dominates (see rank.js).
  * feeds: [{ id, url }]
  */
 export async function aggregate(feeds, { perFeed = 25, max = 500 } = {}) {
@@ -286,6 +288,7 @@ export async function aggregate(feeds, { perFeed = 25, max = 500 } = {}) {
   const seenTitles = new Set();
   const items = [];
   for (const it of results.flat().sort((a, b) => b.published - a.published)) {
+    if (isSpam(it)) continue;
     const tkey = it.title.toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, 80);
     if (seenLinks.has(it.id) || (tkey.length > 20 && seenTitles.has(tkey))) continue;
     seenLinks.add(it.id);
@@ -293,5 +296,5 @@ export async function aggregate(feeds, { perFeed = 25, max = 500 } = {}) {
     items.push(it);
     if (items.length >= max) break;
   }
-  return { items, errors };
+  return { items: diversify(items), errors };
 }
