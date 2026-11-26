@@ -4,13 +4,21 @@
   "description": "An Instagram-style news feed for tech, AI, gaming and science, built on RSS/Atom.",
   "type": "module",
   "private": true,
-  "engines": { "node": ">=18.17" },
+  "engines": {
+    "node": ">=18.17"
+  },
   "scripts": {
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "cf:dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "cf:tail": "wrangler tail"
   },
   "dependencies": {
     "fast-xml-parser": "^5.2.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.168.0"
   }
 }

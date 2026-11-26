@@ -1,11 +1,10 @@
 // Outbound HTTP helpers: URL validation, private-network blocking, timeouts and size caps.
-import dns from 'node:dns/promises';
-import net from 'node:net';
+// Runtime-neutral (Node 18+ and Cloudflare Workers): no Node built-ins are imported here.
 
 const USER_AGENT =
   'Mozilla/5.0 (compatible; PulseNewsReader/2.0; +https://github.com/) AppleWebKit/537.36 (KHTML, like Gecko)';
 
-const ALLOW_PRIVATE = process.env.ALLOW_PRIVATE_HOSTS === '1';
+const ALLOW_PRIVATE = globalThis.process?.env?.ALLOW_PRIVATE_HOSTS === '1';
 
 // Video platforms are intentionally excluded: this app is a news reader, not a video feed.
 const BLOCKED_HOSTS = [/(^|\.)youtube\.com$/i, /(^|\.)youtu\.be$/i, /(^|\.)youtube-nocookie\.com$/i, /(^|\.)twitch\.tv$/i];
@@ -22,8 +21,12 @@ export function isVideoUrl(raw) {
   }
 }
 
-function isPrivateIp(ip) {
-  if (net.isIPv4(ip)) {
+const IPV4 = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+export const isIPv4 = (ip) => IPV4.test(ip) && ip.split('.').every((n) => Number(n) <= 255);
+export const isIPv6 = (ip) => ip.includes(':') && /^[0-9a-f:.]+$/i.test(ip);
+
+export function isPrivateIp(ip) {
+  if (isIPv4(ip)) {
     const [a, b] = ip.split('.').map(Number);
     return (
       a === 0 || a === 10 || a === 127 ||
@@ -63,13 +66,24 @@ export function parsePublicUrl(raw) {
   return url;
 }
 
+// Resolves a hostname to IP addresses. Node installs a DNS-based resolver (see server/index.js);
+// on Cloudflare Workers outbound fetch cannot reach private networks, so only IP literals are checked.
+let resolveHost = null;
+export function setHostResolver(fn) {
+  resolveHost = fn;
+}
+
 async function assertPublicHost(hostname) {
   if (ALLOW_PRIVATE) return;
   const host = hostname.replace(/^\[|\]$/g, '');
-  const addrs = net.isIP(host) ? [{ address: host }] : await dns.lookup(host, { all: true }).catch(() => {
-    throw new FetchError(`Could not resolve ${host}`, 502);
-  });
-  if (addrs.some((a) => isPrivateIp(a.address))) throw new FetchError('Private hosts are not allowed', 400);
+  let addrs;
+  if (isIPv4(host) || isIPv6(host)) addrs = [host];
+  else if (resolveHost) {
+    addrs = await resolveHost(host).catch(() => {
+      throw new FetchError(`Could not resolve ${host}`, 502);
+    });
+  } else addrs = [];
+  if (addrs.some((a) => isPrivateIp(a))) throw new FetchError('Private hosts are not allowed', 400);
 }
 
 /**
@@ -121,7 +135,13 @@ async function readCapped(res, maxBytes) {
       break;
     }
   }
-  return new TextDecoder('utf-8').decode(Buffer.concat(chunks));
+  const out = new Uint8Array(size);
+  let offset = 0;
+  for (const c of chunks) {
+    out.set(c.subarray(0, Math.min(c.byteLength, size - offset)), offset);
+    offset += c.byteLength;
+  }
+  return new TextDecoder('utf-8').decode(out);
 }
 
 /** Run async tasks with a concurrency limit. */

@@ -68,3 +68,17 @@ test/          node:test suites with feed fixtures
 | GET | `/api/preview?url=` | Article `og:image` and description |
 
 Environment variables: `PORT` (3000), `HOST`, `FEED_TTL_MS`, and `ALLOW_PRIVATE_HOSTS=1` (only for local feeds during development).
+
+## Deploying to Cloudflare Workers
+
+The same API code runs on Cloudflare Workers (`worker/index.js`). The app in `public/` is served by Workers Static Assets, and feed results are shared through Cloudflare's edge cache. Configuration is in `wrangler.jsonc`.
+
+```bash
+export CLOUDFLARE_API_TOKEN=...      # token made from the "Edit Cloudflare Workers" template
+export CLOUDFLARE_ACCOUNT_ID=...     # optional if the token can only see one account
+npm run cf:dev     # run locally in the Workers runtime (http://localhost:8787)
+npm run deploy     # publish to https://pulse-news.<your-subdomain>.workers.dev
+npm run cf:tail    # stream live logs
+```
+
+On Workers the private-network check only blocks IP literals, because Workers can't reach private networks anyway. Node also checks DNS answers.

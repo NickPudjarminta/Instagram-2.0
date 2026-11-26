@@ -1,5 +1,4 @@
 // RSS / Atom / RDF parsing and normalisation into "posts" with images and short captions.
-import crypto from 'node:crypto';
 import { XMLParser } from 'fast-xml-parser';
 import { fetchText, isVideoUrl, Lru, mapLimit } from './net.js';
 
@@ -152,8 +151,16 @@ function parseDate(item) {
   return 0;
 }
 
+/** Stable short id for a URL (two FNV-1a passes, base36). Not cryptographic; only used for dedupe/keys. */
 export function hashId(s) {
-  return crypto.createHash('sha1').update(s).digest('base64url').slice(0, 14);
+  let a = 0x811c9dc5;
+  let b = 0x01000193 ^ s.length;
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charCodeAt(i);
+    a = Math.imul(a ^ c, 16777619);
+    b = Math.imul(b ^ c, 2246822519) ^ (b >>> 13);
+  }
+  return (a >>> 0).toString(36).padStart(7, '0') + (b >>> 0).toString(36).padStart(7, '0');
 }
 
 /** Parse feed XML into { title, link, items[] }. Throws if the document is not a feed. */
@@ -209,10 +216,26 @@ export function parseFeed(xml, feedUrl = '') {
 // ---------------------------------------------------------------------------
 // Fetching with a stale-while-revalidate cache.
 
-const FEED_TTL = Number(process.env.FEED_TTL_MS) || 10 * 60 * 1000;
+const FEED_TTL = Number(globalThis.process?.env?.FEED_TTL_MS) || 10 * 60 * 1000;
 const feedCache = new Lru(400);
 
+// Optional second-level cache shared across instances (Cloudflare's Cache API on Workers).
+let feedStore = null;
+export function setFeedStore(store) {
+  feedStore = store;
+}
+
 async function loadFeed(url) {
+  if (feedStore) {
+    const stored = await feedStore.get(url).catch(() => null);
+    if (stored && Date.now() - stored.at < FEED_TTL) return stored.data;
+  }
+  const data = await fetchAndParse(url);
+  if (feedStore) await feedStore.put(url, { at: Date.now(), data }).catch(() => {});
+  return data;
+}
+
+async function fetchAndParse(url) {
   const { text: xml, url: finalUrl } = await fetchText(url, {
     accept: 'application/rss+xml, application/atom+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.5',
   });
