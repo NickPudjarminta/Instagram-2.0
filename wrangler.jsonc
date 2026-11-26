@@ -1,0 +1,22 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "rss-reader",
+	"main": "./src/worker/index.ts",
+	"compatibility_date": "2026-09-01",
+	"assets": {
+		"binding": "ASSETS",
+		"not_found_handling": "single-page-application"
+	},
+	// No "id" here on purpose: Wrangler will automatically provision this KV
+	// namespace on first `wrangler deploy` (and write the id back into this
+	// file). `wrangler dev` also auto-creates a local namespace for it.
+	"kv_namespaces": [
+		{
+			"binding": "RSS_KV",
+			"id": "ed3ff17493894e6d8d0e4b0eb95e4064"
+		}
+	],
+	"observability": {
+		"enabled": true
+	}
+}
