@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+  <title>r/gaming</title>
+  <link rel="alternate" href="https://www.reddit.com/r/gaming/"/>
+  <entry>
+    <title>A cool screenshot</title>
+    <link href="https://www.reddit.com/r/gaming/comments/1/cool/"/>
+    <updated>2026-11-25T08:00:00+00:00</updated>
+    <author><name>/u/player</name></author>
+    <media:thumbnail url="https://b.thumbs.redditmedia.com/x.jpg"/>
+    <content type="html">&lt;p&gt;Look at this&lt;/p&gt;</content>
+  </entry>
+</feed>

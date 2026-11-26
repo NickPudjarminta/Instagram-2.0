@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<channel>
+  <title>Example Tech</title>
+  <link>https://tech.example.com/</link>
+  <item>
+    <title>New GPU &amp; you: what changes</title>
+    <link>https://tech.example.com/gpu</link>
+    <pubDate>Tue, 24 Nov 2026 10:00:00 GMT</pubDate>
+    <dc:creator>Ada Lovelace</dc:creator>
+    <media:content url="https://cdn.example.com/small.jpg" medium="image" width="300"/>
+    <media:content url="https://cdn.example.com/big.jpg" medium="image" width="1200"/>
+    <category>Hardware</category>
+    <description><![CDATA[<p>The <b>new</b> card is fast.</p><p>The post New GPU appeared first on Example.</p>]]></description>
+  </item>
+  <item>
+    <title>Inline image story</title>
+    <link>https://tech.example.com/inline</link>
+    <pubDate>Mon, 23 Nov 2026 10:00:00 GMT</pubDate>
+    <content:encoded><![CDATA[<img src="https://feeds.feedburner.com/~r/pixel.gif" width="1" height="1"><p>Hello</p><img src="/images/photo.png" alt="x">]]></content:encoded>
+  </item>
+  <item>
+    <title>Watch our video</title>
+    <link>https://www.youtube.com/watch?v=abc</link>
+    <pubDate>Mon, 23 Nov 2026 12:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>Enclosure item</title>
+    <guid isPermaLink="true">https://tech.example.com/enc</guid>
+    <enclosure url="http://cdn.example.com/enc.jpg" type="image/jpeg" length="1"/>
+  </item>
+</channel>
+</rss>

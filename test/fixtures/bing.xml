@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:News="https://www.bing.com/news/search?q=nintendo&amp;format=rss" version="2.0">
+<channel><title>Nintendo - BingNews</title><link>https://www.bing.com/news/search?q=nintendo</link>
+<item>
+  <title>Nintendo announces thing</title>
+  <link>http://www.bing.com/news/apiclick.aspx?ref=FexRss&amp;aid=&amp;tid=1&amp;url=https%3a%2f%2fwww.polygon.com%2fnintendo-thing&amp;c=1</link>
+  <description>Big news from Kyoto.</description>
+  <pubDate>Wed, 25 Nov 2026 09:00:00 GMT</pubDate>
+  <News:Source>Polygon</News:Source>
+  <News:Image>http://www.bing.com/th?id=OVFT.abc&amp;pid=News</News:Image>
+</item>
+</channel></rss>
